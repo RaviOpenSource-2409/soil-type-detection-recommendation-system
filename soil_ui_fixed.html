@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>मिट्टी पहचान प्रणाली | Soil Advisory</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Noto+Sans:wght@400;500;600&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --soil-dark: #3B2A1A;
+    --soil-mid: #6B4226;
+    --soil-warm: #A0522D;
+    --soil-light: #C8855A;
+    --leaf-dark: #2D5016;
+    --leaf-mid: #4A7C2F;
+    --leaf-light: #6FA84A;
+    --leaf-pale: #A8D575;
+    --cream: #F5EFE0;
+    --cream-dark: #E8DCC8;
+    --amber: #D4892A;
+    --amber-light: #F0B84A;
+    --text-dark: #1C1208;
+    --text-mid: #4A3520;
+    --text-muted: #7A6048;
+    --white: #FEFCF8;
+    --border: rgba(107, 66, 38, 0.2);
+    --shadow: 0 4px 24px rgba(59, 42, 26, 0.12);
+  }
+
+  body {
+    font-family: 'Noto Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 15% 50%, rgba(107,66,38,0.06) 0%, transparent 50%),
+      radial-gradient(circle at 85% 20%, rgba(74,124,47,0.06) 0%, transparent 50%);
+  }
+
+  header {
+    background: var(--soil-dark);
+    color: var(--cream);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo-circle {
+    width: 44px; height: 44px;
+    background: var(--leaf-mid);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .header-text h1 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--cream);
+    line-height: 1.2;
+  }
+
+  .header-text p {
+    font-size: 12px;
+    color: var(--cream-dark);
+    margin-top: 2px;
+    opacity: 0.8;
+  }
+
+  .header-badge {
+    margin-left: auto;
+    background: var(--leaf-mid);
+    color: var(--cream);
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, var(--soil-dark) 0%, var(--soil-mid) 60%, var(--soil-warm) 100%);
+    color: var(--cream);
+    padding: 56px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(255,255,255,0.02) 40px, rgba(255,255,255,0.02) 41px);
+  }
+
+  .hero-content { position: relative; z-index: 1; max-width: 650px; margin: 0 auto; }
+
+  .hero h2 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+
+  .hero h2 span { color: var(--leaf-pale); }
+
+  .hero p {
+    font-size: 15px;
+    opacity: 0.85;
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .stat-item { text-align: center; }
+  .stat-num { font-size: 28px; font-weight: 700; color: var(--leaf-pale); font-family: 'Libre Baskerville', serif; }
+  .stat-label { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .hero h2 { font-size: 24px; }
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: var(--cream-dark);
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-header-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .icon-soil { background: var(--soil-warm); }
+  .icon-leaf { background: var(--leaf-mid); }
+  .icon-warn { background: var(--amber); }
+
+  .card-header h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dark);
+    font-family: 'Libre Baskerville', serif;
+  }
+
+  .card-body { padding: 20px; }
+
+  .upload-zone {
+    border: 2px dashed var(--soil-light);
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    background: var(--cream);
+    position: relative;
+  }
+
+  .upload-zone:hover { border-color: var(--soil-mid); background: var(--cream-dark); }
+  .upload-zone.drag-over { border-color: var(--leaf-mid); background: rgba(74,124,47,0.08); }
+
+  .upload-icon { font-size: 48px; margin-bottom: 12px; display: block; }
+  .upload-zone h4 { font-size: 16px; font-weight: 600; color: var(--text-dark); margin-bottom: 6px; }
+  .upload-zone p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  .upload-zone input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+
+  #preview-container { margin-top: 16px; display: none; }
+
+  #preview-img {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid var(--soil-light);
+  }
+
+  .file-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    background: var(--cream);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-mid);
+  }
+
+  .btn-analyze {
+    width: 100%;
+    padding: 14px;
+    background: var(--soil-dark);
+    color: var(--cream);
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: all 0.2s;
+    font-family: 'Noto Sans', sans-serif;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-analyze:hover:not(:disabled) { background: var(--soil-mid); transform: translateY(-1px); }
+  .btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-reset {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+    font-family: 'Noto Sans', sans-serif;
+  }
+
+  .btn-reset:hover { background: var(--cream-dark); color: var(--text-mid); }
+
+  /* LOADER */
+  .loader {
+    display: none;
+    text-align: center;
+    padding: 24px;
+    background: var(--cream);
+    border-radius: 12px;
+    margin-top: 16px;
+  }
+
+  .loader-spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--cream-dark);
+    border-top-color: var(--soil-mid);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loader p { font-size: 14px; color: var(--text-muted); }
+  .loader small { font-size: 12px; color: var(--text-muted); opacity: 0.7; margin-top: 4px; display: block; }
+
+  /* WARNING BOX */
+  .warning-box {
+    display: none;
+    background: #FFF8E7;
+    border: 1px solid #E8B84B;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
+  }
+
+  .warning-box h4 {
+    color: #B8860B;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .warning-list {
+    list-style: none;
+    margin: 10px 0;
+  }
+
+  .warning-list li {
+    font-size: 13px;
+    color: var(--text-mid);
+    padding: 4px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .tips-box {
+    background: #F0F7E8;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+  }
+
+  .tips-box p { font-size: 12px; color: var(--leaf-dark); font-weight: 600; margin-bottom: 6px; }
+  .tips-box li { font-size: 12px; color: #3D5C1A; padding: 2px 0; }
+
+  /* RESULT PANEL */
+  .result-panel {
+    display: none;
+    margin-top: 16px;
+  }
+
+  .soil-badge {
+    background: linear-gradient(135deg, var(--soil-dark), var(--soil-mid));
+    color: var(--cream);
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+
+  .soil-badge h4 { font-size: 18px; font-weight: 700; font-family: 'Libre Baskerville', serif; }
+  .soil-badge .soil-type-en { font-size: 13px; opacity: 0.8; margin-top: 2px; }
+
+  .confidence-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .confidence-label { font-size: 12px; opacity: 0.8; white-space: nowrap; }
+  .confidence-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+    width: 0%;
+  }
+
+  .progress-fill.high { background: var(--leaf-pale); }
+  .progress-fill.mid { background: var(--amber-light); }
+  .progress-fill.low { background: #FF8C69; }
+
+  .conf-text { font-size: 14px; font-weight: 700; }
+
+  /* CROPS */
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .chips-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .chip {
+    background: var(--cream-dark);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--text-mid);
+    font-weight: 500;
+  }
+
+  /* QUESTIONS */
+  .questions-section {
+    display: none;
+    margin-top: 20px;
+  }
+
+  .question-item {
+    background: var(--cream);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+
+  .question-label { font-size: 14px; color: var(--text-dark); font-weight: 500; margin-bottom: 10px; display: block; }
+
+  .radio-group { display: flex; gap: 8px; }
+
+  .radio-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+    background: var(--white);
+    color: var(--text-mid);
+    user-select: none;
+  }
+
+  .radio-btn:hover { border-color: var(--soil-light); }
+  .radio-btn.selected-yes { background: #E8F4E0; border-color: var(--leaf-mid); color: var(--leaf-dark); font-weight: 600; }
+  .radio-btn.selected-no { background: #FDE8E8; border-color: #C0392B; color: #8B0000; font-weight: 600; }
+
+  .btn-report {
+    width: 100%;
+    padding: 13px;
+    background: var(--leaf-dark);
+    color: var(--cream);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: all 0.2s;
+    font-family: 'Noto Sans', sans-serif;
+  }
+
+  .btn-report:hover { background: var(--leaf-mid); transform: translateY(-1px); }
+
+  /* ADVICE CARD */
+  .advice-card { display: none; margin-top: 24px; }
+
+  .issue-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .issue-item:last-child { border-bottom: none; }
+  .issue-item.problem { color: #8B4513; }
+  .issue-item.solution { color: var(--leaf-dark); }
+  .issue-dot { flex-shrink: 0; font-size: 16px; }
+
+  /* INFO SIDEBAR */
+  .info-section { margin-top: 24px; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .info-tile {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .info-tile .tile-icon { font-size: 24px; margin-bottom: 6px; }
+  .info-tile .tile-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); }
+  .info-tile .tile-value { font-size: 14px; font-weight: 600; color: var(--text-dark); margin-top: 4px; }
+
+  .how-to-use {
+    background: var(--cream-dark);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+  }
+
+  .how-to-use h4 { font-size: 14px; font-weight: 600; color: var(--text-dark); margin-bottom: 10px; }
+
+  .steps-list { list-style: none; }
+  .steps-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 13px;
+    color: var(--text-mid);
+  }
+
+  .step-num {
+    width: 22px; height: 22px;
+    background: var(--soil-dark);
+    color: var(--cream);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--soil-dark);
+    color: var(--cream-dark);
+    text-align: center;
+    padding: 20px 24px;
+    font-size: 13px;
+    margin-top: 48px;
+  }
+
+  footer span { color: var(--leaf-pale); font-weight: 600; }
+
+  /* AI Badge */
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(74,124,47,0.15);
+    border: 1px solid rgba(74,124,47,0.3);
+    color: var(--leaf-pale);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-circle">🌱</div>
+    <div class="header-text">
+      <h1>मिट्टी पहचान प्रणाली</h1>
+      <p>Soil Type Detection & Crop Advisory</p>
+    </div>
+    <div class="header-badge">AI Powered</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-content">
+    <h2>अपनी <span>मिट्टी पहचानें</span>,<br>सही फसल उगाएं</h2>
+    <p>केवल मिट्टी की फोटो अपलोड करें — AI तुरंत मिट्टी का प्रकार पहचानेगा और फसल व उपचार की सलाह देगा।</p>
+    <div class="ai-badge">🤖 Claude Vision AI से संचालित</div>
+    <div class="hero-stats" style="margin-top:20px;">
+      <div class="stat-item"><div class="stat-num">12</div><div class="stat-label">मिट्टी के प्रकार</div></div>
+      <div class="stat-item"><div class="stat-num">70%+</div><div class="stat-label">Confidence आवश्यक</div></div>
+      <div class="stat-item"><div class="stat-num">Real AI</div><div class="stat-label">Claude Vision</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="grid-2">
+
+    <!-- LEFT: Upload + Result -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon icon-soil">📷</div>
+          <h3>मिट्टी की फोटो अपलोड करें</h3>
+        </div>
+        <div class="card-body">
+          <div class="upload-zone" id="drop-zone">
+            <span class="upload-icon">🌍</span>
+            <h4>फोटो यहाँ खींचें या क्लिक करें</h4>
+            <p>JPG, PNG, WEBP — केवल मिट्टी की स्पष्ट फोटो<br>साफ रोशनी में, ऊपर से खींची हुई</p>
+            <input type="file" id="soil-image" accept="image/*">
+          </div>
+
+          <div id="preview-container">
+            <img id="preview-img" alt="Preview">
+            <div class="file-info">
+              <span>📁</span>
+              <span id="file-name">-</span>
+            </div>
+          </div>
+
+          <button class="btn-analyze" id="analyze-btn" onclick="analyzeSoil()" disabled>
+            🔍 मिट्टी पहचानें (AI Analysis)
+          </button>
+          <button class="btn-reset" onclick="resetUpload()">↩ दोबारा शुरू करें</button>
+
+          <!-- LOADER -->
+          <div class="loader" id="loader">
+            <div class="loader-spinner"></div>
+            <p>AI छवि का विश्लेषण कर रहा है...</p>
+            <small>Claude Vision मिट्टी पहचान रहा है</small>
+          </div>
+
+          <!-- WARNING BOX: Not a soil image -->
+          <div class="warning-box" id="warning-box">
+            <h4>⚠️ छवि मान्य नहीं है</h4>
+            <p style="font-size:14px; color:var(--text-mid); margin-bottom:8px;">यह मिट्टी की फोटो नहीं लग रही, या AI इसे पहचान नहीं पाया।</p>
+            <ul class="warning-list" id="warning-reasons">
+              <li>❌ दी गई छवि मिट्टी की नहीं लग रही</li>
+              <li>❌ फोटो अस्पष्ट, धुंधली या बहुत दूर से ली गई है</li>
+              <li>❌ प्रकाश बहुत कम या बहुत ज़्यादा है</li>
+            </ul>
+            <div class="tips-box">
+              <p>✅ सही फोटो कैसे लें?</p>
+              <ul class="warning-list">
+                <li>✅ मिट्टी के पास जाकर ऊपर से फोटो लें</li>
+                <li>✅ साफ रोशनी में फोटो खींचें</li>
+                <li>✅ केवल मिट्टी का भाग ही फ्रेम में रखें</li>
+                <li>✅ कैमरा स्थिर रखें, blur न हो</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- RESULT PANEL -->
+          <div class="result-panel" id="result-panel">
+            <div class="soil-badge" id="soil-badge-box">
+              <h4 id="soil-badge">🌍 — मिट्टी</h4>
+              <div class="soil-type-en" id="soil-type-en"></div>
+              <div class="confidence-row">
+                <span class="confidence-label">विश्वास स्तर:</span>
+                <div class="confidence-bar">
+                  <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <span class="conf-text" id="conf-text">—</span>
+              </div>
+            </div>
+
+            <div class="section-label">इस मिट्टी में उगने वाली फसलें</div>
+            <div class="chips-row" id="crop-chips"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUESTIONS -->
+      <div class="card questions-section" id="questions-section">
+        <div class="card-header">
+          <div class="card-header-icon icon-warn">❓</div>
+          <h3>खेत की अतिरिक्त जानकारी</h3>
+        </div>
+        <div class="card-body">
+          <div id="questions-list"></div>
+          <button class="btn-report" onclick="generateReport()">📋 पूरी सलाह रिपोर्ट देखें</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Advice + Info -->
+    <div>
+      <!-- ADVICE CARD -->
+      <div class="card advice-card" id="advice-card">
+        <div class="card-header">
+          <div class="card-header-icon icon-leaf">🌿</div>
+          <h3>मिट्टी की समस्याएं व समाधान</h3>
+        </div>
+        <div class="card-body">
+          <div class="section-label" style="margin-bottom:12px;">⚠️ संभावित समस्याएं</div>
+          <div id="issues-list"></div>
+          <div class="section-label" style="margin-top:20px; margin-bottom:12px;">🛠️ उपचार व सलाह</div>
+          <div id="treatments-list"></div>
+        </div>
+      </div>
+
+      <!-- INFO TILES -->
+      <div class="info-section">
+        <div class="info-grid">
+          <div class="info-tile">
+            <div class="tile-icon">🧠</div>
+            <div class="tile-label">AI Engine</div>
+            <div class="tile-value">Claude Vision</div>
+          </div>
+          <div class="info-tile">
+            <div class="tile-icon">🎯</div>
+            <div class="tile-label">Threshold</div>
+            <div class="tile-value">70% Confidence</div>
+          </div>
+          <div class="info-tile">
+            <div class="tile-icon">🌾</div>
+            <div class="tile-label">Classes</div>
+            <div class="tile-value">12 मिट्टी प्रकार</div>
+          </div>
+          <div class="info-tile">
+            <div class="tile-icon">⚡</div>
+            <div class="tile-label">Speed</div>
+            <div class="tile-value">~5 सेकंड</div>
+          </div>
+        </div>
+
+        <div class="how-to-use">
+          <h4>📖 कैसे उपयोग करें?</h4>
+          <ul class="steps-list">
+            <li><div class="step-num">1</div><span>मिट्टी की साफ फोटो खींचें — ऊपर से, अच्छी रोशनी में</span></li>
+            <li><div class="step-num">2</div><span>फोटो अपलोड करें या यहाँ drag करें</span></li>
+            <li><div class="step-num">3</div><span>"मिट्टी पहचानें" बटन दबाएं — AI analyze करेगा</span></li>
+            <li><div class="step-num">4</div><span>मिट्टी का प्रकार, फसलें और समस्याएं देखें</span></li>
+            <li><div class="step-num">5</div><span>सवालों के जवाब देकर पूरी सलाह रिपोर्ट पाएं</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p>🌾 मिट्टी पहचान प्रणाली &nbsp;|&nbsp; Soil Type Detection & Advisory &nbsp;|&nbsp; Powered by <span>Claude Vision AI</span></p>
+  <p style="margin-top:6px; opacity:0.6;">किसानों के लिए, किसानों द्वारा — सही फसल, सही ज़मीन</p>
+</footer>
+
+<script>
+// ===== SOIL DATA =====
+const soilData = {
+  "Alluvial": {
+    hindiName: "जलोढ़ मिट्टी",
+    crops: ["गेहूँ","चावल","गन्ना","मक्का","आलू"],
+    issues: ["लगातार खेती से नाइट्रोजन व जिंक की कमी","अत्यधिक सिंचाई से उर्वरता कम होना","जैविक पदार्थ घट जाना"],
+    treatments: ["1 एकड़ के लिए 45 किलो यूरिया पहली सिंचाई में डालें","10 किलो जिंक सल्फेट खेत में मिलाएं","2–3 टन सड़ी गोबर खाद डालें","हर 3 साल में मिट्टी परीक्षण करें","दलहनी फसल के साथ फसल चक्र अपनाएं"]
+  },
+  "Arid": {
+    hindiName: "शुष्क मिट्टी",
+    crops: ["बाजरा","चना","ज्वार","मक्का","गेहूँ"],
+    issues: ["पानी की भारी कमी","गर्मी से फसल झुलसना","जैविक पदार्थ कम"],
+    treatments: ["ड्रिप सिंचाई हल्की 2 घंटे करें","3 टन गोबर खाद डालें","मल्चिंग करें","सूखा सहनशील बीज लगाएं","1% पोटाश घोल 15 दिन अंतर से स्प्रे करें"]
+  },
+  "Black": {
+    hindiName: "काली मिट्टी",
+    crops: ["कपास","सोयाबीन","गेहूँ","गन्ना","मक्का"],
+    issues: ["सूखने पर गहरी दरारें पड़ती हैं","वर्षा में जलभराव","फॉस्फोरस की कमी"],
+    treatments: ["1 फीट गहरी नाली बनाकर जल निकासी करें","50 किलो DAP प्रति एकड़ बुवाई के समय दें","2 टन गोबर खाद खेत में डालें","बारिश के बाद हल्की गुड़ाई करें","19:19:19 NPK 1% घोल 20 दिन अंतर से स्प्रे करें"]
+  },
+  "Clay": {
+    hindiName: "चिकनी मिट्टी",
+    crops: ["चावल","गेहूँ","गन्ना","सोयाबीन","मक्का"],
+    issues: ["मिट्टी भारी व चिपचिपी","जड़ों का विकास बाधित","पानी रुकने की समस्या"],
+    treatments: ["1–1.5 फीट गहरी नालियां बनाएं","3 टन जैविक खाद डालें","साल में एक बार 6–8 इंच गहरी जुताई करें","50 किलो DAP प्रति एकड़ डालें","1% NPK घोल 15 दिन अंतर से 2 बार स्प्रे करें"]
+  },
+  "Dry": {
+    hindiName: "सूखी मिट्टी",
+    crops: ["बाजरा","चना","ज्वार","मक्का","गेहूँ"],
+    issues: ["नमी की कमी","उत्पादन घटता है","मिट्टी सख्त होना"],
+    treatments: ["ड्रिप सिंचाई 1–1.5 घंटे प्रति एकड़, 2 दिन अंतर से","मल्चिंग करें","2 टन गोबर खाद डालें","गहरी जुताई करें","1% NPK घोल स्प्रे करें"]
+  },
+  "Laterite": {
+    hindiName: "लैटेराइट मिट्टी",
+    crops: ["चाय","नारियल","काजू","मक्का","बाजरा"],
+    issues: ["अम्लीय मिट्टी","फॉस्फोरस की कमी","कम उत्पादन"],
+    treatments: ["200 किलो चूना प्रति एकड़ डालें","50 किलो DAP डालें","2 टन जैविक खाद डालें","दलहनी फसल लगाएं","1% NPK स्प्रे करें"]
+  },
+  "Loamy": {
+    hindiName: "दोमट मिट्टी",
+    crops: ["गेहूँ","चावल","टमाटर","गन्ना","मक्का"],
+    issues: ["लगातार खेती से उर्वरता कम","माइक्रोन्यूट्रिएंट की कमी","असंतुलित उर्वरक उपयोग"],
+    treatments: ["2 टन गोबर खाद डालें","NPK 50:25:25 अनुपात में दें","10 किलो जिंक सल्फेट डालें","2 साल में मिट्टी परीक्षण करें","फसल चक्र अपनाएं"]
+  },
+  "Peat": {
+    hindiName: "पीट मिट्टी",
+    crops: ["चावल","सब्जियाँ","आलू","गन्ना","टमाटर"],
+    issues: ["अत्यधिक नमी","जड़ सड़न खतरा","अम्लीय प्रकृति"],
+    treatments: ["जल निकासी मजबूत करें","200 किलो चूना डालें","2 टन गोबर खाद डालें","फफूंदनाशक 2 ग्राम प्रति लीटर घोल छिड़कें","संतुलित NPK दें"]
+  },
+  "Red": {
+    hindiName: "लाल मिट्टी",
+    crops: ["मूंगफली","बाजरा","मक्का","गेहूँ","आलू"],
+    issues: ["नाइट्रोजन की कमी","कम जैविक पदार्थ","जिंक की कमी"],
+    treatments: ["45 किलो यूरिया प्रति एकड़ डालें","2 टन गोबर खाद मिलाएं","10 किलो जिंक सल्फेट डालें","ढैंचा हरी खाद डालें","1% 19:19:19 NPK 15 दिन अंतर से स्प्रे करें"]
+  },
+  "Sandy": {
+    hindiName: "बलुई मिट्टी",
+    crops: ["तरबूज","मूंगफली","बाजरा","गाजर","मक्का"],
+    issues: ["पानी तुरंत नीचे चला जाता है","पोषक तत्व टिकते नहीं","नमी की भारी कमी"],
+    treatments: ["हर 3–4 दिन हल्की सिंचाई करें","3–4 टन गोबर खाद प्रति एकड़ डालें","1 टन वर्मी कम्पोस्ट डालें","सूखी घास 2 इंच मोटी बिछाएं (मल्चिंग)","0.5% जिंक घोल 20 दिन में 2 बार छिड़कें"]
+  },
+  "Sandy_loam": {
+    hindiName: "बलुई दोमट मिट्टी",
+    crops: ["गेहूँ","मक्का","चावल","टमाटर","आलू"],
+    issues: ["मध्यम नमी समस्या","पोषक तत्व धीरे कम होना","माइक्रोन्यूट्रिएंट की कमी"],
+    treatments: ["2 टन गोबर खाद डालें","50 किलो NPK प्रति एकड़ दें","10 किलो जिंक डालें","हल्की नियमित सिंचाई करें","फसल चक्र अपनाएं"]
+  },
+  "Yellow": {
+    hindiName: "पीली मिट्टी",
+    crops: ["मक्का","बाजरा","सोयाबीन","गेहूँ","आलू"],
+    issues: ["नाइट्रोजन की कमी","कम उर्वरता","कमजोर वृद्धि"],
+    treatments: ["45 किलो यूरिया डालें","2 टन गोबर खाद मिलाएं","10 किलो जिंक डालें","दलहनी फसल लगाएं","1% NPK स्प्रे करें"]
+  }
+};
+
+const questions = [
+  "क्या खेत में पानी जमा रहता है?",
+  "क्या मिट्टी जल्दी सूख जाती है?",
+  "क्या फसल पीली पड़ रही है?",
+  "क्या फसल धीमी गति से बढ़ रही है?",
+  "क्या मिट्टी सख्त हो गई है?"
+];
+
+const extraIssues = [
+  "खेत में जलभराव की अतिरिक्त समस्या",
+  "मिट्टी में नमी की भारी कमी",
+  "नाइट्रोजन या जिंक की कमी (फसल पीली)",
+  "पौध वृद्धि धीमी",
+  "मिट्टी कठोर हो गई है"
+];
+
+const extraTreatments = [
+  "1 फीट गहरी नाली बनाएं ताकि पानी 24 घंटे में निकल जाए",
+  "2–3 दिन के अंतर से हल्की सिंचाई करें (1–1.5 घंटे प्रति एकड़)",
+  "0.5% जिंक सल्फेट घोल 15 दिन अंतर से 2 बार स्प्रे करें",
+  "19:19:19 NPK 10 ग्राम प्रति लीटर पानी में घोलकर छिड़काव करें",
+  "रोटावेटर से 6–8 इंच गहरी जुताई करें"
+];
+
+let currentSoil = null;
+let currentImageBase64 = null;
+let currentMediaType = 'image/jpeg'; // track actual file type
+
+// ===== FILE HANDLING =====
+const fileInput = document.getElementById('soil-image');
+const dropZone = document.getElementById('drop-zone');
+
+fileInput.addEventListener('change', function() {
+  if (this.files && this.files[0]) handleFile(this.files[0]);
+});
+
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+
+function getMediaType(file) {
+  // Map file type to Anthropic-supported media types
+  const typeMap = {
+    'image/jpeg': 'image/jpeg',
+    'image/jpg':  'image/jpeg',
+    'image/png':  'image/png',
+    'image/gif':  'image/gif',
+    'image/webp': 'image/webp',
+  };
+  return typeMap[file.type.toLowerCase()] || 'image/jpeg';
+}
+
+function handleFile(file) {
+  if (!file.type.startsWith('image/')) {
+    alert('कृपया एक image file चुनें।');
+    return;
+  }
+  currentMediaType = getMediaType(file);
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    currentImageBase64 = dataUrl.split(',')[1];
+
+    document.getElementById('preview-img').src = dataUrl;
+    document.getElementById('preview-container').style.display = 'block';
+    document.getElementById('file-name').textContent = file.name;
+    document.getElementById('analyze-btn').disabled = false;
+
+    // Hide previous results
+    document.getElementById('result-panel').style.display = 'none';
+    document.getElementById('warning-box').style.display = 'none';
+    document.getElementById('questions-section').style.display = 'none';
+    document.getElementById('advice-card').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function resetUpload() {
+  fileInput.value = '';
+  currentImageBase64 = null;
+  currentMediaType = 'image/jpeg';
+  currentSoil = null;
+  document.getElementById('preview-container').style.display = 'none';
+  document.getElementById('analyze-btn').disabled = true;
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('warning-box').style.display = 'none';
+  document.getElementById('questions-section').style.display = 'none';
+  document.getElementById('advice-card').style.display = 'none';
+  document.getElementById('loader').style.display = 'none';
+}
+
+// ===== MAIN AI ANALYSIS FUNCTION =====
+async function analyzeSoil() {
+  if (!currentImageBase64) return;
+
+  document.getElementById('loader').style.display = 'block';
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('warning-box').style.display = 'none';
+  document.getElementById('questions-section').style.display = 'none';
+  document.getElementById('advice-card').style.display = 'none';
+  document.getElementById('analyze-btn').disabled = true;
+
+  const soilClasses = Object.keys(soilData).join(', ');
+
+  const prompt = `You are an expert soil scientist. Look at this image carefully.
+
+Decide if this image shows soil, mud, dirt, earth, ground, or land surface.
+
+Be GENEROUS - if you can see any ground/earth/soil texture (even with some grass/plants on it), mark is_soil as true.
+Only mark false if it is clearly NOT soil (face, building, food, pure sky, animal only, etc).
+
+SOIL TYPES TO CHOOSE FROM: ${soilClasses}
+
+Pick the closest match. Respond ONLY with raw JSON, no markdown, no extra text:
+{"is_soil": true, "soil_type": "Clay", "confidence": 0.85, "reason": "चिकनी मिट्टी दिख रही है"}
+
+If not soil:
+{"is_soil": false, "soil_type": null, "confidence": 0.1, "reason": "यह मिट्टी नहीं है"}`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 300,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "image",
+                source: {
+                  type: "base64",
+                  media_type: currentMediaType,
+                  data: currentImageBase64
+                }
+              },
+              {
+                type: "text",
+                text: prompt
+              }
+            ]
+          }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('analyze-btn').disabled = false;
+
+    if (!response.ok) {
+      showWarning("API Error: " + (data.error?.message || "कुछ गड़बड़ हुई, दोबारा कोशिश करें।"));
+      return;
+    }
+
+    // Parse the AI response
+    const rawText = data.content.map(b => b.text || '').join('').trim();
+    let parsed;
+
+    try {
+      // Extract JSON from response
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("No JSON found");
+      parsed = JSON.parse(jsonMatch[0]);
+    } catch (e) {
+      showWarning("AI response parse करने में समस्या। दोबारा कोशिश करें।");
+      return;
+    }
+
+    // Check result
+    if (!parsed.is_soil || parsed.confidence < 0.55 || !parsed.soil_type) {
+      showWarning(parsed.reason || "यह मिट्टी की फोटो नहीं लग रही।");
+    } else {
+      showResult(parsed.soil_type, parsed.confidence);
+    }
+
+  } catch (err) {
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('analyze-btn').disabled = false;
+    showWarning("Network error: " + err.message);
+  }
+}
+
+function showWarning(reason) {
+  const wb = document.getElementById('warning-box');
+  wb.style.display = 'block';
+
+  // Update reason text if provided
+  const reasonsList = document.getElementById('warning-reasons');
+  if (reason && reason.length > 5) {
+    reasonsList.innerHTML = `
+      <li>❌ ${reason}</li>
+      <li>❌ फोटो अस्पष्ट, धुंधली या बहुत दूर से ली गई हो सकती है</li>
+      <li>❌ प्रकाश बहुत कम या बहुत ज़्यादा है</li>
+    `;
+  }
+}
+
+function showResult(soilKey, confidence) {
+  // Normalize key (handle case mismatches)
+  let matchedKey = Object.keys(soilData).find(k => k.toLowerCase() === soilKey.toLowerCase()) || soilKey;
+
+  // Fallback if not in our data
+  if (!soilData[matchedKey]) {
+    matchedKey = "Loamy"; // default fallback
+  }
+
+  currentSoil = matchedKey;
+  const pct = Math.round(confidence * 100);
+  const info = soilData[matchedKey];
+
+  document.getElementById('soil-badge').textContent = '🌍 ' + info.hindiName;
+  document.getElementById('soil-type-en').textContent = matchedKey + ' Soil';
+  document.getElementById('conf-text').textContent = pct + '%';
+
+  const fill = document.getElementById('progress-fill');
+  fill.className = 'progress-fill ' + (pct < 70 ? 'low' : pct < 85 ? 'mid' : 'high');
+  setTimeout(() => { fill.style.width = pct + '%'; }, 100);
+
+  const chips = document.getElementById('crop-chips');
+  chips.innerHTML = info.crops.map(c => `<span class="chip">🌾 ${c}</span>`).join('');
+
+  document.getElementById('result-panel').style.display = 'block';
+  buildQuestions();
+  document.getElementById('questions-section').style.display = 'block';
+}
+
+function buildQuestions() {
+  const list = document.getElementById('questions-list');
+  list.innerHTML = questions.map((q, i) => `
+    <div class="question-item">
+      <label class="question-label">${i + 1}. ${q}</label>
+      <div class="radio-group" data-answer="no">
+        <div class="radio-btn" onclick="selectAnswer(${i}, 'yes', this)">✅ हाँ</div>
+        <div class="radio-btn" onclick="selectAnswer(${i}, 'no', this)">❌ ना</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectAnswer(qIndex, val, el) {
+  const group = el.parentElement;
+  group.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('selected-yes', 'selected-no'));
+  el.classList.add(val === 'yes' ? 'selected-yes' : 'selected-no');
+  group.dataset.answer = val;
+}
+
+function generateReport() {
+  if (!currentSoil) return;
+  const qItems = document.querySelectorAll('.question-item');
+  const answers = Array.from(qItems).map(q => q.querySelector('.radio-group').dataset.answer || 'no');
+
+  let issues = [...soilData[currentSoil].issues];
+  let treatments = [...soilData[currentSoil].treatments];
+
+  answers.forEach((a, i) => {
+    if (a === 'yes') {
+      issues.push(extraIssues[i]);
+      treatments.push(extraTreatments[i]);
+    }
+  });
+
+  const issueList = document.getElementById('issues-list');
+  issueList.innerHTML = issues.slice(0, 5).map(iss =>
+    `<div class="issue-item problem"><span class="issue-dot">⚠️</span><span>${iss}</span></div>`
+  ).join('');
+
+  const treatList = document.getElementById('treatments-list');
+  treatList.innerHTML = treatments.slice(0, 6).map(tr =>
+    `<div class="issue-item solution"><span class="issue-dot">✔️</span><span>${tr}</span></div>`
+  ).join('');
+
+  document.getElementById('advice-card').style.display = 'block';
+  document.getElementById('advice-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
